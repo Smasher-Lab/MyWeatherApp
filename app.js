@@ -11,13 +11,26 @@ app.get('/', async (req, res) => {
     const apiKey = "4cb8978da64e4ed60ba489164308e922";
     const city = req.query.city || 'London';
 
+      if (!city) {
+    // First time loading the page — no city entered
+    return res.render('index', { weather: null, error: null });
+  }
+
     try {
-        const response = await axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
-        res.render('index', { weather: response.data });
+     const response = await axios.get(url);
+     const weatherData = response.data;
+
+     res.render('index', {
+      weather: weatherData,
+      error: null
+     });
     } catch (error) {
-        console.error("Error fetching weather:", error);
-        res.render('index', { error: "Failed to get weather data." });
-    }
+      console.error(error);
+      res.render('index', {
+      weather: null,
+     error: 'City not found or API error.'
+     });
+   }
 });
 
 
