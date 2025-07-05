@@ -11,6 +11,9 @@ body {
     font-family: Arial, sans-serif;
     text-align: center;
     background: #ffffff;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 header {
     background-color: #71c3e0;
@@ -74,15 +77,17 @@ nav li {
 .dropdown:hover .dropdown-content {
   display: block;
 }
-
-h1 {
+.weather-title{
     margin :20px;
     font-size: 5rem;
     font-family: "Comic Relief", system-ui;
     font-weight: 500;
 }
-h2 {
-   margin: 10px;
+.weather-subtitle{
+    font-size: 2rem;
+    font-family: "Comic Relief", system-ui;
+    font-weight: 500;
+    margin: 10px;
     color: #097af3;
 }
 input, button {
@@ -110,4 +115,65 @@ body.dark-mode {
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+#mode-toggle:hover {
+  background-color: #ddd;
+}
+.weather-info {
+  margin: 20px;
+  padding: 20px;
+}
+.weather-info h2 {
+  color: #f96424;
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 2rem;
+}
+.weather-info p {
+  margin: 2px 0;
+  font-size: 1.2rem;
+}
+.weather-info img {
+  width: 100px;
+  height: 100px;
+}
+.weather-info .temperature {
+  font-size: 2.5rem;
+  color: #f96424;
+  font-weight: bold;
+}
+.weather-info .description {
+  font-size: 1.5rem;
+  color: #555;
+}
+.forecast-title {
+  font-family: "Comic Relief", system-ui;
+  font-weight: bold;
+  font-size: 2rem;
+  color: #f96424;
+  margin: 20px;
+}
+.forecast-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+.forecast-card {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 15px;
+  width: 200px;
+  text-align: center;
+}
+footer{
+  margin-top: 40px;
+  text-align: center;
+  padding: 20px;
+  background-color: #444646;
+  color: rgb(255, 250, 250);
+}
+footer a {
+  margin: 5px 0;
+  color: rgb(255, 250, 250);
 }

@@ -49,8 +49,8 @@
   </header>
 
   <main>
-    <h1>Weather 🌤️</h1>
-    <h2>Search for a city</h2>
+    <h1 class="weather-title">Weather 🌤️</h1>
+    <h2 class="weather-subtitle">Search for a city</h2>
 
     <ul id="favorites-list"></ul>
 
@@ -58,7 +58,9 @@
       <input type="text" name="city" placeholder="Enter city" />
       <button type="submit">Search</button>
     </form>
+    <button onclick="getLocation()">📍 Use Current Location</button>
 
+  <div class="weather-info" >
     <% if (weather) { %>
       <h2><%= weather.name %></h2>
       <button onclick="saveCity('<%= weather.name %>')">⭐ Save to Favorites</button>
@@ -67,12 +69,12 @@
     <% } else if (error) { %>
       <p><%= error %></p>
     <% } %>
-
+  </div>
     <% if (forecast) { %>
-      <h3>5-Day Forecast</h3>
-      <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+      <h3 class="forecast-title">5-period Forecast</h3>
+      <div class="forecast-container">
         <% forecast.forEach(day => { %>
-          <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px;">
+          <div class="forecast-card">
             <p><%= new Date(day.dt_txt).toLocaleString() %></p>
             <p><%= day.main.temp %>°C</p>
             <p><%= day.weather[0].description %></p>
@@ -90,11 +92,11 @@
       </div>
     <% } %>
 
-    <button onclick="getLocation()">📍 Use Current Location</button>
   </main>
 
-  <footer style="margin-top: 40px; text-align: center;">
-    <p>Made in INDIA <strong>Lalith</strong></p>
+  <footer >
+    <p>Made in INDIA , By <strong>Lalith</strong></p>
+    <p>&copy; 2025 Lalith</p>
     <p><a href="https://github.com/Smasher-Lab/MyWeatherApp" target="_blank">View on GitHub</a></p>
   </footer>
 
@@ -118,12 +120,12 @@
 
     if (weatherType) {
       switch (weatherType.toLowerCase()) {
-        case 'clear': body.style.backgroundImage = "url('/images/clearskybg.webp')"; break;
-        case 'clouds': body.style.backgroundImage = "url('/images/cloudsbg.jpg')"; break;
+        case 'clear': body.style.backgroundImage = "url('/clearskybg.webp')"; break;
+        case 'clouds': body.style.backgroundImage = "url('/rainybg.jpg')"; break;
         case 'rain':
-        case 'drizzle': body.style.backgroundImage = "url('/images/rainybg.jpg')"; break;
-        case 'thunderstorm': body.style.backgroundImage = "url('/images/thunderstorm.jpg')"; break;
-        case 'snow': body.style.backgroundImage = "url('/images/snow.avif')"; break;
+        case 'drizzle': body.style.backgroundImage = "url('/rainybg.jpg')"; break;
+        case 'thunderstorm': body.style.backgroundImage = "url('/thunderstorm.jpg')"; break;
+        case 'snow': body.style.backgroundImage = "url('/snow.avif')"; break;
         default: body.style.background = "#f0f0f0";
       }
     }
