@@ -1,164 +1,186 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Weather App</title>
-   <link rel="stylesheet" href="/style.css">
+  <title>Weather App</title>
+  <link rel="stylesheet" href="/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Comic+Relief:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 20px;
+    }
+    nav ul li {
+      position: relative;
+    }
+    nav ul li ul.dropdown-content {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background-color: white;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      z-index: 999;
+    }
+    nav ul li:hover ul.dropdown-content {
+      display: block;
+    }
+  </style>
 </head>
 <body id="weather-body">
-    <button onclick="toggleMode()" id="mode-toggle">🌙 Dark Mode</button>
+  <header>
+    <p id="app-title">Lalith's Weather App</p>
+    <nav>
+      <ul>
+        <li><a href="/">Home</a></li>
+        <li class="dropdown"> 
+          <a href="#">Favorites ▼</a>
+          <ul class="dropdown-content" id="nav-favorites-list"></ul>
+        </li>
+        <li><a href="/about">About</a></li>
+        <li><a href="/contact">Contact</a></li>
+      </ul>
+    </nav>
+    <button onclick="toggleMode()" id="mode-toggle">🌙 Dark</button>
+  </header>
 
-    <h1>Weather App 🌤️</h1>
+  <main>
+    <h1>Weather 🌤️</h1>
     <h2>Search for a city</h2>
-    <h3>Favorites:</h3>
+
     <ul id="favorites-list"></ul>
 
     <form method="GET" action="/">
-        <input type="text" name="city" placeholder="Enter city" />
-        <button type="submit">Search</button>
+      <input type="text" name="city" placeholder="Enter city" />
+      <button type="submit">Search</button>
     </form>
 
     <% if (weather) { %>
-        <h2><%= weather.name %></h2>
-        <button onclick="saveCity('<%= weather.name %>')">⭐ Save to Favorites</button>
-
-        <p>Temperature: <%= weather.main.temp %>°C</p>
-        <p>Condition: <%= weather.weather[0].description %></p>
+      <h2><%= weather.name %></h2>
+      <button onclick="saveCity('<%= weather.name %>')">⭐ Save to Favorites</button>
+      <p>Temperature: 🌡️ <%= weather.main.temp %>°C</p>
+      <p>Condition: <%= weather.weather[0].description %></p>
     <% } else if (error) { %>
-        <p><%= error %></p>
+      <p><%= error %></p>
     <% } %>
+
     <% if (forecast) { %>
-       <h3>5-Day Forecast (next 5 periods)</h3>
-        <div style="display: flex; gap: 20px; justify-content: center;">
-          <% forecast.forEach(day => { %>
+      <h3>5-Day Forecast</h3>
+      <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+        <% forecast.forEach(day => { %>
           <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px;">
-             <p><%= new Date(day.dt_txt).toLocaleString() %></p>
-             <p><%= day.main.temp %>°C</p>
-             <p><%= day.weather[0].description %></p>
+            <p><%= new Date(day.dt_txt).toLocaleString() %></p>
+            <p><%= day.main.temp %>°C</p>
+            <p><%= day.weather[0].description %></p>
+            <% if (weathertype) { %>
+              <% const type = weathertype.toLowerCase(); %>
+              <% if (type === 'clear') { %><p>☀️ Clear Sky</p>
+              <% } else if (type === 'clouds') { %><p>☁️ Cloudy</p>
+              <% } else if (type === 'rain') { %><p>🌧️ Rainy</p>
+              <% } else if (type === 'thunderstorm') { %><p>⛈️ Thunderstorm</p>
+              <% } else if (type === 'snow') { %><p>❄️ Snowy</p>
+              <% } else { %><p>🌈 Unknown Weather</p><% } %>
+            <% } %>
           </div>
-         <% }) %>
-       </div>
-   <% } %>
-       <button onclick="getLocation()">📍Use Current Location</button>
-    <p>Powered by OpenWeatherMap</p>
-    <script>
-        function getLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    window.location.href = `/weather?lat=${lat}&lon=${lon}`;
-                }, function(error) {
-                    alert('Error getting location: ' + error.message);
-                });
-            } else {
-                alert('Geolocation is not supported by this browser.');
-            }
-        
-        }
+        <% }) %>
+      </div>
+    <% } %>
+
+    <button onclick="getLocation()">📍 Use Current Location</button>
+  </main>
+
+  <footer style="margin-top: 40px; text-align: center;">
+    <p>Made in INDIA <strong>Lalith</strong></p>
+    <p><a href="https://github.com/Smasher-Lab/MyWeatherApp" target="_blank">View on GitHub</a></p>
+  </footer>
+
+  <script>
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          window.location.href = `/weather?lat=${lat}&lon=${lon}`;
+        }, function (error) {
+          alert('Error getting location: ' + error.message);
+        });
+      } else {
+        alert('Geolocation not supported.');
+      }
+    }
 
     const weatherType = "<%= weather ? weather.weather[0].main : '' %>";
     const body = document.getElementById("weather-body");
 
     if (weatherType) {
-        switch (weatherType.toLowerCase()) {
-            case 'clear':
-                body.style.background = "linear-gradient(to bottom, #87CEEB, #fefbd8)";
-                break;
-            case 'clouds':
-                body.style.background = "linear-gradient(to bottom, #d3d3d3, #a9a9a9)";
-                break;
-            case 'rain':
-            case 'drizzle':
-                body.style.background = "linear-gradient(to bottom, #4b79a1, #283e51)";
-                break;
-            case 'thunderstorm':
-                body.style.background = "linear-gradient(to bottom, #0f2027, #203a43, #2c5364)";
-                break;
-            case 'snow':
-                body.style.background = "linear-gradient(to bottom, #e0eafc, #cfdef3)";
-                break;
-            default:
-                body.style.background = "#f0f0f0";
-        }
+      switch (weatherType.toLowerCase()) {
+        case 'clear': body.style.backgroundImage = "url('/images/clearskybg.webp')"; break;
+        case 'clouds': body.style.backgroundImage = "url('/images/cloudsbg.jpg')"; break;
+        case 'rain':
+        case 'drizzle': body.style.backgroundImage = "url('/images/rainybg.jpg')"; break;
+        case 'thunderstorm': body.style.backgroundImage = "url('/images/thunderstorm.jpg')"; break;
+        case 'snow': body.style.backgroundImage = "url('/images/snow.avif')"; break;
+        default: body.style.background = "#f0f0f0";
+      }
     }
 
-  function toggleMode() {
-    const body = document.body;
-    const btn = document.getElementById('mode-toggle');
-
-    if (body.classList.contains('dark-mode')) {
-      body.classList.remove('dark-mode');
-      body.classList.add('light-mode');
-      btn.textContent = '🌙 Dark Mode';
-    } else {
-      body.classList.remove('light-mode');
-      body.classList.add('dark-mode');
-      btn.textContent = '☀️ Light Mode';
+    function toggleMode() {
+      const body = document.body;
+      const btn = document.getElementById('mode-toggle');
+      const isDark = body.classList.toggle('dark-mode');
+      body.classList.toggle('light-mode', !isDark);
+      btn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+      localStorage.setItem('mode', isDark ? 'dark' : 'light');
     }
-  }
 
-  // Optional: Remember user preference using localStorage
-  window.onload = () => {
-    const mode = localStorage.getItem('mode') || 'light';
-    document.body.classList.add(mode + '-mode');
-    document.getElementById('mode-toggle').textContent =
-      mode === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-  };
+    function saveCity(city) {
+      let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+      if (!favorites.includes(city)) {
+        favorites.push(city);
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+        renderFavorites();
+      }
+    }
 
-  function toggleMode() {
-    const body = document.body;
-    const btn = document.getElementById('mode-toggle');
-    const isDark = body.classList.toggle('dark-mode');
-    body.classList.toggle('light-mode', !isDark);
-    btn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
-    localStorage.setItem('mode', isDark ? 'dark' : 'light');
-  }
-  
-  // Save the city name
-  function saveCity(city) {
-    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-    if (!favorites.includes(city)) {
-      favorites.push(city);
-      localStorage.setItem('favorites', JSON.stringify(favorites));
+
+
+    function renderFavorites() {
+      const list = document.getElementById('favorites-list');
+      const navList = document.getElementById('nav-favorites-list');
+      const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+      list.innerHTML = '';
+      navList.innerHTML = '';
+
+      favorites.forEach(city => {
+        const li1 = document.createElement('li');
+        const a1 = document.createElement('a');
+        a1.href = `/?city=${city}`;
+        a1.textContent = city;
+        li1.appendChild(a1);
+        li1.appendChild(removeBtn);
+        list.appendChild(li1);
+
+        const li2 = document.createElement('li');
+        const a2 = document.createElement('a');
+        a2.href = `/?city=${city}`;
+        a2.textContent = city;
+        li2.appendChild(a2);
+        navList.appendChild(li2);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const mode = localStorage.getItem('mode') || 'light';
+      document.body.classList.add(mode + '-mode');
+      document.getElementById('mode-toggle').textContent =
+        mode === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
       renderFavorites();
-    }
-  }
-
-  // Render favorite cities as clickable links
-  function renderFavorites() {
-    const list = document.getElementById('favorites-list');
-    list.innerHTML = ''; // Clear existing list
-    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
-
-    favorites.forEach(city => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `/?city=${city}`;
-      a.textContent = city;
-      li.appendChild(a);
-      list.appendChild(li);
     });
-  }
-
-  // Load favorites on page load
-  window.onload = function () {
-    renderFavorites();
-
-    // Load preferred theme if any
-    const mode = localStorage.getItem('mode') || 'light';
-    document.body.classList.add(mode + '-mode');
-    const toggleBtn = document.getElementById('mode-toggle');
-    if (toggleBtn) {
-      toggleBtn.textContent = mode === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
-    }
-  };
-
-    </script>
-<footer style="margin-top: 40px; text-align: center;">
-  <p>Made in INDIA <strong>Lalith</strong></p>
-  <p><a href="https://github.com/Smasher-Lab/MyWeatherApp" target="_blank">View on GitHub</a></p>
-</footer>
+  </script>
 </body>
-
-
 </html>
