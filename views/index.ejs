@@ -2,10 +2,16 @@
 <html>
 <head>
     <title>Weather App</title>
-    <link rel="stylesheet" href="/style.css">
+   <link rel="stylesheet" href="/style.css">
 </head>
-<body>
+<body id="weather-body">
+    <button onclick="toggleMode()" id="mode-toggle">🌙 Dark Mode</button>
+
     <h1>Weather App 🌤️</h1>
+    <h2>Search for a city</h2>
+    <h3>Favorites:</h3>
+    <ul id="favorites-list"></ul>
+
     <form method="GET" action="/">
         <input type="text" name="city" placeholder="Enter city" />
         <button type="submit">Search</button>
@@ -13,10 +19,140 @@
 
     <% if (weather) { %>
         <h2><%= weather.name %></h2>
+        <button onclick="saveCity('<%= weather.name %>')">⭐ Save to Favorites</button>
+
         <p>Temperature: <%= weather.main.temp %>°C</p>
         <p>Condition: <%= weather.weather[0].description %></p>
     <% } else if (error) { %>
         <p><%= error %></p>
     <% } %>
+    <% if (forecast) { %>
+       <h3>5-Day Forecast (next 5 periods)</h3>
+        <div style="display: flex; gap: 20px; justify-content: center;">
+          <% forecast.forEach(day => { %>
+          <div style="border: 1px solid #ccc; padding: 10px; border-radius: 8px;">
+             <p><%= new Date(day.dt_txt).toLocaleString() %></p>
+             <p><%= day.main.temp %>°C</p>
+             <p><%= day.weather[0].description %></p>
+          </div>
+         <% }) %>
+       </div>
+   <% } %>
+       <button onclick="getLocation()">📍Use Current Location</button>
+    <p>Powered by OpenWeatherMap</p>
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    window.location.href = `/weather?lat=${lat}&lon=${lon}`;
+                }, function(error) {
+                    alert('Error getting location: ' + error.message);
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        
+        }
+
+    const weatherType = "<%= weather ? weather.weather[0].main : '' %>";
+    const body = document.getElementById("weather-body");
+
+    if (weatherType) {
+        switch (weatherType.toLowerCase()) {
+            case 'clear':
+                body.style.background = "linear-gradient(to bottom, #87CEEB, #fefbd8)";
+                break;
+            case 'clouds':
+                body.style.background = "linear-gradient(to bottom, #d3d3d3, #a9a9a9)";
+                break;
+            case 'rain':
+            case 'drizzle':
+                body.style.background = "linear-gradient(to bottom, #4b79a1, #283e51)";
+                break;
+            case 'thunderstorm':
+                body.style.background = "linear-gradient(to bottom, #0f2027, #203a43, #2c5364)";
+                break;
+            case 'snow':
+                body.style.background = "linear-gradient(to bottom, #e0eafc, #cfdef3)";
+                break;
+            default:
+                body.style.background = "#f0f0f0";
+        }
+    }
+
+  function toggleMode() {
+    const body = document.body;
+    const btn = document.getElementById('mode-toggle');
+
+    if (body.classList.contains('dark-mode')) {
+      body.classList.remove('dark-mode');
+      body.classList.add('light-mode');
+      btn.textContent = '🌙 Dark Mode';
+    } else {
+      body.classList.remove('light-mode');
+      body.classList.add('dark-mode');
+      btn.textContent = '☀️ Light Mode';
+    }
+  }
+
+  // Optional: Remember user preference using localStorage
+  window.onload = () => {
+    const mode = localStorage.getItem('mode') || 'light';
+    document.body.classList.add(mode + '-mode');
+    document.getElementById('mode-toggle').textContent =
+      mode === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+  };
+
+  function toggleMode() {
+    const body = document.body;
+    const btn = document.getElementById('mode-toggle');
+    const isDark = body.classList.toggle('dark-mode');
+    body.classList.toggle('light-mode', !isDark);
+    btn.textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+    localStorage.setItem('mode', isDark ? 'dark' : 'light');
+  }
+  
+  // Save the city name
+  function saveCity(city) {
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+    if (!favorites.includes(city)) {
+      favorites.push(city);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      renderFavorites();
+    }
+  }
+
+  // Render favorite cities as clickable links
+  function renderFavorites() {
+    const list = document.getElementById('favorites-list');
+    list.innerHTML = ''; // Clear existing list
+    const favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+    favorites.forEach(city => {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `/?city=${city}`;
+      a.textContent = city;
+      li.appendChild(a);
+      list.appendChild(li);
+    });
+  }
+
+  // Load favorites on page load
+  window.onload = function () {
+    renderFavorites();
+
+    // Load preferred theme if any
+    const mode = localStorage.getItem('mode') || 'light';
+    document.body.classList.add(mode + '-mode');
+    const toggleBtn = document.getElementById('mode-toggle');
+    if (toggleBtn) {
+      toggleBtn.textContent = mode === 'dark' ? '☀️ Light Mode' : '🌙 Dark Mode';
+    }
+  };
+
+    </script>
 </body>
 </html>
